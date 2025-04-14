@@ -46,8 +46,6 @@ M = t1 + C
 The intermediate code is turned into machine instructions — this looks closer to what a computer understands, but it’s not yet optimized or in binary.
 
 ## Example:
-* Copy
-* Edit
 * LOAD A  
 * DIV B  
 * STORE t1  
