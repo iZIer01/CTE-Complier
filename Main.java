@@ -1,3 +1,7 @@
+import java.util.List;
+
+import Scanner.Lexer;
+import Scanner.TokenInfo;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,5 +18,11 @@ public class Main {
             "WRITEE F;\n" +
             "END";
       
-    }
+    Lexer lexer = new Lexer(code);       // Pass code to scanner
+    List<TokenInfo> tokens = lexer.tokenize();  // Get token list
+
+        for (TokenInfo token : tokens) {
+            System.out.println(token);  // Print each token
+        }
+}
 }
