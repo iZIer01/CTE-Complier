@@ -9,13 +9,14 @@ public class Lexer {
     // This will help us read the code
     private final CodeReader reader;
 
-    // Creating another constructor that will give it the input and it prepares to read it
+    // Creating another constructor that will give it the input and it prepares to
+    // read it
     public Lexer(String input) {
         this.reader = new CodeReader(input);
     }
-/*----------------------------------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------------------------------*/
 
-    //A loop to go through the input and creates a list of tokens
+    // A loop to go through the input and creates a list of tokens
     public List<TokenInfo> tokenize() {
         List<TokenInfo> tokens = new ArrayList<>();
 
@@ -23,7 +24,7 @@ public class Lexer {
         while (!reader.isAtEnd()) {
             char c = reader.peek();
 
-            //Here we skip spaces or newlines
+            // Here we skip spaces or newlines
             if (Character.isWhitespace(c)) {
                 reader.next(); // move to next character
             }
@@ -38,7 +39,7 @@ public class Lexer {
                 tokens.add(readNumber());
             }
 
-            // check if its an the equal sign 
+            // check if its an the equal sign
             else if (c == '=') {
                 reader.next();
                 tokens.add(new TokenInfo(TokenType.ASSIGNMENT_OPERATOR, "="));
@@ -50,6 +51,12 @@ public class Lexer {
                 tokens.add(new TokenInfo(TokenType.SEMICOLON, ";"));
             }
 
+            // Handle common math operators: + - * /
+            else if (c == '+' || c == '-' || c == '*' || c == '/') {
+                reader.next();
+                tokens.add(new TokenInfo(TokenType.OPERATOR, String.valueOf(c)));
+            }
+
             // incase the code has somthing anything else we don’t know
             else {
                 tokens.add(new TokenInfo(TokenType.UNKNOWN_TOKEN, String.valueOf(reader.next())));
@@ -59,10 +66,9 @@ public class Lexer {
         return tokens;
     }
 
-/*----------------------------------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------------------------------*/
 
-    
-    // This section we focus on reading a word like a variable name or a keyword 
+    // This section we focus on reading a word like a variable name or a keyword
     private TokenInfo readWord() {
         StringBuilder wordBuilder = new StringBuilder();
 
@@ -82,7 +88,7 @@ public class Lexer {
         return new TokenInfo(TokenType.IDENTIFIER, word);
     }
 
-    // It reads for numbers 
+    // It reads for numbers
     private TokenInfo readNumber() {
         StringBuilder numberBuilder = new StringBuilder();
 
@@ -93,7 +99,7 @@ public class Lexer {
         return new TokenInfo(TokenType.INTEGER, numberBuilder.toString());
     }
 
-/*----------------------------------------------------------------------------------------------------*/
+    /*----------------------------------------------------------------------------------------------------*/
 
     // Checks if a word is a known keyword in our language
     private boolean isKeyword(String word) {

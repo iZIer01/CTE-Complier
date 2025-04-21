@@ -1,5 +1,6 @@
 import java.util.List;
-
+import ICR.IntermediateCodeRepresentation;
+import ICR.IntermediateCodeRepresentation.ThreeAddressCode;
 import Scanner.Lexer;
 import Scanner.TokenInfo;
 
@@ -17,12 +18,40 @@ public class Main {
             "WRITE M\n" +
             "WRITEE F;\n" +
             "END";
-      
-    Lexer lexer = new Lexer(code);       // Pass code to scanner
-    List<TokenInfo> tokens = lexer.tokenize();  // Get token list
 
+        // Stage 1: Lexical Analysis
+        Lexer lexer = new Lexer(code);
+        List<TokenInfo> tokens = lexer.tokenize();
+
+        System.out.println("----- Tokens from Lexical Analysis -----");
         for (TokenInfo token : tokens) {
-            System.out.println(token);  // Print each token
+            System.out.println(token);
         }
-}
+
+        // Stage 2 & 3: Semantic Analysis
+        SemanticChecker semanticChecker = new SemanticChecker();
+        semanticChecker.analyze(tokens);
+
+        // Stage 4: Intermediate Code Generation
+        System.out.println("\n----- Intermediate Code Representation (Three Address Code) -----");
+
+        // Process the full code to extract expressions from "LET" statements and generate ICR
+        String[] lines = code.split("\n");
+        for (String line : lines) {
+            if (line.startsWith("LET")) {
+                String[] parts = line.split("=");
+                if (parts.length == 2) {
+                    String expr = parts[1].trim(); // The right-hand side expression
+                    String target = parts[0].split(" ")[1].trim(); // The target variable from the LET statement
+
+                    System.out.println("ICR for " + target + " = " + expr);
+                    List<ThreeAddressCode> codeList = IntermediateCodeRepresentation.generateICR(expr, target);
+                    for (ThreeAddressCode tac : codeList) {
+                        System.out.println(tac);
+                    }
+                    System.out.println();
+                }
+            }
+        }
+    }
 }
