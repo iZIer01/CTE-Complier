@@ -1,3 +1,5 @@
+package SemanticScanner;
+
 import Scanner.TokenInfo;
 import Scanner.TokenType;
 import java.util.*;

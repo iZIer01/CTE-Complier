@@ -27,39 +27,41 @@ public class IntermediateCodeRepresentation {
 
     public static List<ThreeAddressCode> generateICR(String expression, String target) {
         List<ThreeAddressCode> codeList = new ArrayList<>();
-        String postfix = infixToPostfix(expression);
-        Stack<String> evalStack = new Stack<>();
+        try {
+            String postfix = infixToPostfix(expression);
+            Stack<String> evalStack = new Stack<>();
 
-        // Process postfix expression
-        for (String token : tokenizePostfix(postfix)) {
-            if (isOperand(token)) {
-                evalStack.push(token);
-            } else if (isOperator(token)) {
-                // Ensure enough operands are in the stack
-                if (evalStack.size() < 2) {
-                    throw new IllegalArgumentException("Invalid expression: Not enough operands for operator " + token);
+            for (String token : tokenizePostfix(postfix)) {
+                if (isOperand(token)) {
+                    evalStack.push(token);
+                } else if (isOperator(token)) {
+                    if (evalStack.size() < 2) {
+                        throw new IllegalArgumentException("Not enough operands for operator '" + token +
+                                "' in expression '" + expression + "'");
+                    }
+                    String op2 = evalStack.pop();
+                    String op1 = evalStack.pop();
+                    String temp = "t" + (tempVarCounter++);
+                    codeList.add(new ThreeAddressCode(temp, op1, token, op2));
+                    evalStack.push(temp);
                 }
-                String op2 = evalStack.pop();
-                String op1 = evalStack.pop();
-                String temp = "t" + (tempVarCounter++);
-                codeList.add(new ThreeAddressCode(temp, op1, token, op2));
-                evalStack.push(temp);
             }
-        }
 
-        // Final result assignment
-        if (evalStack.isEmpty()) {
-            throw new IllegalArgumentException("Invalid expression: Result not found.");
-        }
+            if (evalStack.isEmpty()) {
+                throw new IllegalArgumentException("No result produced from expression '" + expression + "'");
+            }
 
-        String finalTemp = evalStack.pop();
-        codeList.add(new ThreeAddressCode(target, finalTemp, "", ""));
+            String finalTemp = evalStack.pop();
+            codeList.add(new ThreeAddressCode(target, finalTemp, "", ""));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to generate ICR for expression '" + expression + "': " + e.getMessage());
+        }
         return codeList;
     }
 
     // Helper Methods
 
-    private static boolean isOperator(String token) {
+    public static boolean isOperator(String token) {
         return "+-*/".indexOf(token) != -1;
     }
 

@@ -1,6 +1,7 @@
 import java.util.List;
 import ICR.IntermediateCodeRepresentation;
 import ICR.IntermediateCodeRepresentation.ThreeAddressCode;
+import SemanticScanner.SemanticChecker;
 import Scanner.Lexer;
 import Scanner.TokenInfo;
 
@@ -41,17 +42,40 @@ public class Main {
             if (line.startsWith("LET")) {
                 String[] parts = line.split("=");
                 if (parts.length == 2) {
-                    String expr = parts[1].trim(); // The right-hand side expression
-                    String target = parts[0].split(" ")[1].trim(); // The target variable from the LET statement
+                    String expr = parts[1].trim();
+                    String target = parts[0].split(" ")[1].trim();
 
                     System.out.println("ICR for " + target + " = " + expr);
-                    List<ThreeAddressCode> codeList = IntermediateCodeRepresentation.generateICR(expr, target);
-                    for (ThreeAddressCode tac : codeList) {
-                        System.out.println(tac);
+                    try {
+                        // First check if expression contains invalid operator sequences
+                        if (hasConsecutiveOperators(expr)) {
+                            System.out.println("  [ICR Error] Invalid expression: consecutive operators in '" + expr + "'");
+                            continue;
+                        }
+
+                        List<ThreeAddressCode> codeList = IntermediateCodeRepresentation.generateICR(expr, target);
+                        for (ThreeAddressCode tac : codeList) {
+                            System.out.println(tac);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("  [ICR Error] Failed to generate ICR for '" + expr + "': " + e.getMessage());
                     }
                     System.out.println();
                 }
             }
         }
+
+
+    }
+    private static boolean hasConsecutiveOperators(String expr) {
+        for (int i = 0; i < expr.length() - 1; i++) {
+            char c1 = expr.charAt(i);
+            char c2 = expr.charAt(i + 1);
+            if (IntermediateCodeRepresentation.isOperator(String.valueOf(c1)) &&
+                    IntermediateCodeRepresentation.isOperator(String.valueOf(c2))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
