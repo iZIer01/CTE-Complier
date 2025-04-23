@@ -7,7 +7,7 @@ public class IntermediateCodeRepresentation {
     private static int tempVarCounter = 1;
 
     public static class ThreeAddressCode {
-        String result, arg1, operator, arg2;
+        public String result, arg1, operator, arg2; // Make fields public
 
         public ThreeAddressCode(String result, String arg1, String operator, String arg2) {
             this.result = result;
@@ -22,6 +22,16 @@ public class IntermediateCodeRepresentation {
                 return result + " = " + arg1;
             }
             return result + " = " + arg1 + " " + operator + " " + arg2;
+        }
+
+        public String operatorToInstruction() { // Make method public
+            switch (operator) {
+                case "+": return "ADD";
+                case "-": return "SUB";
+                case "*": return "MUL";
+                case "/": return "DIV";
+                default: throw new IllegalArgumentException("Unknown operator: " + operator);
+            }
         }
     }
 

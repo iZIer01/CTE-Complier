@@ -4,6 +4,7 @@ import ICR.IntermediateCodeRepresentation.ThreeAddressCode;
 import SemanticScanner.SemanticChecker;
 import Scanner.Lexer;
 import Scanner.TokenInfo;
+import CodeGenerator.CodeGenerator;
 
 public class Main {
     public static void main(String[] args) {
@@ -57,6 +58,10 @@ public class Main {
                         for (ThreeAddressCode tac : codeList) {
                             System.out.println(tac);
                         }
+
+                        // Generate code from ICR
+                        CodeGenerator.generateCode(codeList);
+
                     } catch (Exception e) {
                         System.out.println("  [ICR Error] Failed to generate ICR for '" + expr + "': " + e.getMessage());
                     }
