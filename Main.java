@@ -1,25 +1,25 @@
 import java.util.List;
+
+import BinaryConverter.BinaryGenerator;
 import ICR.IntermediateCodeRepresentation;
 import ICR.IntermediateCodeRepresentation.ThreeAddressCode;
 import SemanticScanner.SemanticChecker;
 import Scanner.Lexer;
 import Scanner.TokenInfo;
-import CodeGenerator.CodeGenerator;
 
 public class Main {
     public static void main(String[] args) {
-        String code = 
-            "BEGIN\n" +
-            "INTEGER A, B, C, E, M, N, G, H, I, a, c\n" +
-            "INPUT A, B, C\n" +
-            "LET B = A */ M\n" +
-            "LET G = a + c\n" +
-            "temp = <s%**h - j / w +d +*$&;\n" +
-            "M = A/B+C\n" +
-            "N = G/H-I+a*B/c\n" +
-            "WRITE M\n" +
-            "WRITEE F;\n" +
-            "END";
+        String code = "BEGIN\n" +
+                "INTEGER A, B, C, E, M, N, G, H, I, a, c\n" +
+                "INPUT A, B, C\n" +
+                "LET B = A */ M\n" + // Intentionally broken
+                "LET G = a + c\n" +
+                "temp = <s%**h - j / w +d +*$&;\n" + // Junk line to trigger errors
+                "M = A/B+C\n" +
+                "N = G/H-I+a*B/c\n" +
+                "WRITE M\n" +
+                "WRITEE F;\n" +
+                "END";
 
         // Stage 1: Lexical Analysis
         Lexer lexer = new Lexer(code);
@@ -30,14 +30,13 @@ public class Main {
             System.out.println(token);
         }
 
-        // Stage 2 & 3: Semantic Analysis
+        // Stage 2: Semantic Analysis
         SemanticChecker semanticChecker = new SemanticChecker();
         semanticChecker.analyze(tokens);
 
-        // Stage 4: Intermediate Code Generation
+        // Stage 3 & 4: Intermediate Code Generation & Binary Code
         System.out.println("\n----- Intermediate Code Representation (Three Address Code) -----");
 
-        // Process the full code to extract expressions from "LET" statements and generate ICR
         String[] lines = code.split("\n");
         for (String line : lines) {
             if (line.startsWith("LET")) {
@@ -47,31 +46,34 @@ public class Main {
                     String target = parts[0].split(" ")[1].trim();
 
                     System.out.println("ICR for " + target + " = " + expr);
+
                     try {
-                        // First check if expression contains invalid operator sequences
                         if (hasConsecutiveOperators(expr)) {
-                            System.out.println("  [ICR Error] Invalid expression: consecutive operators in '" + expr + "'");
+                            System.out.println(
+                                    "  [ICR Error] Invalid expression: consecutive operators in '" + expr + "'");
                             continue;
                         }
 
                         List<ThreeAddressCode> codeList = IntermediateCodeRepresentation.generateICR(expr, target);
+
                         for (ThreeAddressCode tac : codeList) {
                             System.out.println(tac);
                         }
 
-                        // Generate code from ICR
-                        CodeGenerator.generateCode(codeList);
+                        // Stage 4: Binary Code Generation
+                        BinaryGenerator.generateBinary(codeList);
 
                     } catch (Exception e) {
-                        System.out.println("  [ICR Error] Failed to generate ICR for '" + expr + "': " + e.getMessage());
+                        System.out
+                                .println("  [ICR Error] Failed to generate ICR for '" + expr + "': " + e.getMessage());
                     }
+
                     System.out.println();
                 }
             }
         }
-
-
     }
+
     private static boolean hasConsecutiveOperators(String expr) {
         for (int i = 0; i < expr.length() - 1; i++) {
             char c1 = expr.charAt(i);
