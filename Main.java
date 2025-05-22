@@ -1,6 +1,7 @@
 import java.util.List;
 
 import BinaryConverter.BinaryGenerator;
+import CodeGenerator.CodeGenerator;
 import ICR.IntermediateCodeRepresentation;
 import ICR.IntermediateCodeRepresentation.ThreeAddressCode;
 import SemanticScanner.SemanticChecker;
@@ -59,7 +60,7 @@ public class Main {
                         for (ThreeAddressCode tac : codeList) {
                             System.out.println(tac);
                         }
-
+                        CodeGenerator.generateCode(codeList);
                         // Stage 4: Binary Code Generation
                         BinaryGenerator.generateBinary(codeList);
 
